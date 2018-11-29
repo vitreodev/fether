@@ -3,15 +3,15 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-import abi from '@parity/contracts/lib/abi/eip20';
-import BigNumber from 'bignumber.js';
-import { makeContract } from '@parity/light.js';
-import memoize from 'lodash/memoize';
-import { toWei } from '@parity/api/lib/util/wei';
+import abi from "@parity/contracts/lib/abi/eip20";
+import BigNumber from "bignumber.js";
+import { makeContract } from "@parity/light.js";
+import memoize from "lodash/memoize";
+import { toWei } from "@parity/api/lib/util/wei";
 
-import Debug from './debug';
+import Debug from "./debug";
 
-const debug = Debug('estimateGas');
+const debug = Debug("estimateGas");
 const GAS_MULT_FACTOR = 1.25; // Since estimateGas is not always accurate, we add a 33% factor for buffer.
 
 export const contractForToken = memoize(tokenAddress =>
@@ -23,10 +23,10 @@ export const contractForToken = memoize(tokenAddress =>
  */
 export const estimateGas = (tx, token, api) => {
   if (!tx || !Object.keys(tx).length) {
-    return Promise.reject(new Error('Tx not set.'));
+    return Promise.reject(new Error("Tx not set."));
   }
 
-  if (token.address === 'ETH') {
+  if (token.address === "ETH") {
     return estimateGasForEth(txForEth(tx), api).then(addBuffer);
   } else {
     return estimateGasForErc20(txForErc20(tx, token), token).then(addBuffer);
@@ -63,7 +63,7 @@ const estimateGasForEth = memoize((txForEth, api) => {
  * estimateGas.
  */
 const addBuffer = estimated => {
-  const withBuffer = estimated.mul(GAS_MULT_FACTOR);
+  const withBuffer = estimated.multipliedBy(GAS_MULT_FACTOR);
   debug(`Estimated gas ${+estimated}, with buffer ${+withBuffer}.`);
   return withBuffer;
 };
@@ -76,11 +76,13 @@ export const txForErc20 = (tx, token) => {
   return {
     args: [
       tx.to,
-      new BigNumber(tx.amount).mul(new BigNumber(10).pow(token.decimals))
+      new BigNumber(tx.amount).multipliedBy(
+        new BigNumber(10).pow(token.decimals)
+      )
     ],
     options: {
       from: tx.from,
-      gasPrice: toWei(tx.gasPrice, 'shannon') // shannon == gwei
+      gasPrice: toWei(tx.gasPrice, "shannon") // shannon == gwei
     }
   };
 };
@@ -92,7 +94,7 @@ export const txForErc20 = (tx, token) => {
 export const txForEth = tx => {
   return {
     from: tx.from,
-    gasPrice: toWei(tx.gasPrice, 'shannon'), // shannon == gwei
+    gasPrice: toWei(tx.gasPrice, "shannon"), // shannon == gwei
     to: tx.to,
     value: toWei(tx.amount.toString())
   };
