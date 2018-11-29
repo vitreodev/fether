@@ -34,10 +34,10 @@
     "test": "react-app-rewired test --env=jsdom"
   },
   "dependencies": {
-    "@parity/api": "^3.0.1",
-    "@parity/contracts": "^3.0.1",
-    "@parity/light.js": "^3.0.1",
-    "@parity/light.js-react": "^3.0.1",
+    "@parity/api": "^3.0.5",
+    "@parity/contracts": "^3.0.5",
+    "@parity/light.js": "^3.0.5",
+    "@parity/light.js-react": "^3.0.5",
     "bignumber.js": "^4.1.0",
     "debounce-promise": "^3.1.0",
     "debug": "^3.1.0",
