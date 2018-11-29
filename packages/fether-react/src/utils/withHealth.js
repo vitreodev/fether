@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-import BigNumber from "bignumber.js";
-import { combineLatest, Observable, of, fromEvent, merge } from "rxjs";
-import { compose, mapPropsStream } from "recompose";
+import BigNumber from 'bignumber.js';
+import { combineLatest, Observable, of, fromEvent, merge } from 'rxjs';
+import { compose, mapPropsStream } from 'recompose';
 import {
   delay,
   distinctUntilChanged,
@@ -15,42 +15,42 @@ import {
   startWith,
   switchMap,
   take
-} from "rxjs/operators";
-import isElectron from "is-electron";
-import isEqual from "lodash/isEqual";
-import { peerCount$, syncStatus$, withoutLoading } from "@parity/light.js";
+} from 'rxjs/operators';
+import isElectron from 'is-electron';
+import isEqual from 'lodash/isEqual';
+import { peerCount$, syncStatus$, withoutLoading } from '@parity/light.js';
 
-import parityStore from "../stores/parityStore";
+import parityStore from '../stores/parityStore';
 
-const electron = isElectron() ? window.require("electron") : null;
+const electron = isElectron() ? window.require('electron') : null;
 
 // List here all possible states of our health store. Each state can have a
 // payload.
 export const STATUS = {
-  CLOCKNOTSYNC: Symbol("CLOCKNOTSYNC"), // Local clock is not sync
-  DOWNLOADING: Symbol("DOWNLOADING"), // Currently downloading Parity
-  GOOD: Symbol("GOOD"), // Everything's fine
-  NOINTERNET: Symbol("NOINTERNET"), // No Internet connection
-  NOPEERS: Symbol("NOPEERS"), // Not connected to any peers
-  LAUNCHING: Symbol("LAUNCHING"), // Parity is being launched (only happens at startup)
-  SYNCING: Symbol("SYNCING") // Obvious
+  CLOCKNOTSYNC: Symbol('CLOCKNOTSYNC'), // Local clock is not sync
+  DOWNLOADING: Symbol('DOWNLOADING'), // Currently downloading Parity
+  GOOD: Symbol('GOOD'), // Everything's fine
+  NOINTERNET: Symbol('NOINTERNET'), // No Internet connection
+  NOPEERS: Symbol('NOPEERS'), // Not connected to any peers
+  LAUNCHING: Symbol('LAUNCHING'), // Parity is being launched (only happens at startup)
+  SYNCING: Symbol('SYNCING') // Obvious
 };
 
 const isApiConnected$ = parityStore.isApiConnected$;
 
 const isParityRunning$ = Observable.create(observer => {
   if (electron) {
-    electron.ipcRenderer.on("parity-running", (_, isParityRunning) => {
+    electron.ipcRenderer.on('parity-running', (_, isParityRunning) => {
       observer.next(isParityRunning);
     });
   }
 }).pipe(
-  startWith(electron ? !!electron.remote.getGlobal("isParityRunning") : false)
+  startWith(electron ? !!electron.remote.getGlobal('isParityRunning') : false)
 );
 
 const downloadProgress$ = Observable.create(observer => {
   if (electron) {
-    electron.ipcRenderer.on("parity-download-progress", (_, progress) => {
+    electron.ipcRenderer.on('parity-download-progress', (_, progress) => {
       observer.next(progress);
     });
   }
@@ -58,16 +58,16 @@ const downloadProgress$ = Observable.create(observer => {
 
 const isClockSync$ = Observable.create(observer => {
   if (electron) {
-    electron.ipcRenderer.send("asynchronous-message", "check-clock-sync");
-    electron.ipcRenderer.once("check-clock-sync-reply", (_, clockSync) => {
+    electron.ipcRenderer.send('asynchronous-message', 'check-clock-sync');
+    electron.ipcRenderer.once('check-clock-sync-reply', (_, clockSync) => {
       observer.next(clockSync.isClockSync);
     });
   }
 }).pipe(startWith(true));
 
 const online$ = merge(
-  fromEvent(window, "online").pipe(map(() => true)),
-  fromEvent(window, "offline").pipe(map(() => false))
+  fromEvent(window, 'online').pipe(map(() => true)),
+  fromEvent(window, 'offline').pipe(map(() => false))
 ).pipe(startWith(navigator.onLine));
 
 const combined$ = combineLatest(
