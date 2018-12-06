@@ -25,6 +25,20 @@ class AccountName extends Component {
   handleChangeName = ({ target: { value } }) =>
     this.props.createAccountStore.setName(value);
 
+  handleKeyPress = e => {
+    const {
+      history,
+      location: { pathname },
+      createAccountStore: { name }
+    } = this.props;
+
+    const currentStep = pathname.slice(-1);
+
+    if (e.key === 'Enter' && name) {
+      history.push(`/accounts/new/${+currentStep + 1}`);
+    }
+  };
+
   render () {
     const {
       createAccountStore: { isImport }
@@ -32,19 +46,6 @@ class AccountName extends Component {
 
     return isImport ? this.renderCardWhenImported() : this.renderCardWhenNew();
   }
-
-  handleKeyPress = e => {
-    const {
-      history,
-      location: { pathname }
-    } = this.props;
-
-    const currentStep = pathname.slice(-1);
-
-    if (e.key === 'Enter') {
-      history.push(`/accounts/new/${+currentStep + 1}`);
-    }
-  };
 
   renderCardWhenImported = () => {
     const {
