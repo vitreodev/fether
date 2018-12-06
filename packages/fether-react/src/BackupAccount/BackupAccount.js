@@ -52,13 +52,7 @@ class BackupAccount extends Component {
         }
 
         createAccountStore.clear();
-        /*
-          FIXME: this timeout is a placeholder for after the backup file is saved.
-          AFAICT there is no callback from FileSaver.saveAs() so I'm not sure how to handle this yet.
-          If it just goes straight to the accounts page it's not clear anything happened at all, and
-          a little loading time however arbitrary at least gives the sense that something's happened.
-        */
-        setTimeout(() => history.push(`/accounts`), 3000);
+        history.push(`/accounts`);
       })
       .catch(err => {
         this.toggleMsg(err.text + ' Please check your password and try again.');

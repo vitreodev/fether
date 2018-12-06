@@ -21,15 +21,46 @@ class AccountPassword extends Component {
     this.setState({ confirm: value });
   };
 
+  handleNextStep = e => {
+    const { history } = this.props;
+    const { confirm, password } = this.state;
+
+    e.preventDefault();
+
+    if (e.target.type === 'click') {
+      history.goBack();
+    }
+
+    if (
+      e.target.type === 'submit' &&
+      confirm &&
+      password &&
+      confirm === password
+    ) {
+      this.handleSubmit();
+    }
+
+    if (!password || !confirm) {
+      this.setState({
+        error: 'Cannot have empty form fields.'
+      });
+    }
+
+    if (password && confirm && password !== confirm) {
+      this.setState({
+        error: 'Passwords do not match.'
+      });
+    }
+  };
+
   handlePasswordChange = ({ target: { value } }) => {
     this.setState({ password: value });
   };
 
-  handleSubmit = event => {
+  handleSubmit = () => {
     const { createAccountStore, history } = this.props;
     const { password } = this.state;
 
-    event.preventDefault();
     this.setState({ isLoading: true });
 
     // Save to parity
@@ -52,7 +83,6 @@ class AccountPassword extends Component {
   render () {
     const {
       createAccountStore: { address, name, isJSON, isImport },
-      history,
       location: { pathname }
     } = this.props;
     const { confirm, error, isLoading, password } = this.state;
@@ -63,7 +93,7 @@ class AccountPassword extends Component {
         address={address}
         name={name}
         drawers={[
-          <form key='createAccount' onSubmit={this.handleSubmit}>
+          <form key='createAccount' onSubmit={this.handleNextStep}>
             <div className='text'>
               <p>
                 {' '}
@@ -97,7 +127,10 @@ class AccountPassword extends Component {
 
             <nav className='form-nav -space-around'>
               {currentStep > 1 && (
-                <button className='button -cancel' onClick={history.goBack}>
+                <button
+                  className='button -cancel'
+                  onClick={this.handleNextStep}
+                >
                   Back
                 </button>
               )}
